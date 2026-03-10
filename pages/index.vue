@@ -122,8 +122,8 @@ onMounted(async () => {
     
     // Fetch data in parallel
     await Promise.all([
-      clinicStore.fetchClinics(),
-      userStore.fetchUsers()
+      clinicStore.refreshClinics(),
+      userStore.refreshUsers()
     ])
     
     // Update progress to 100%

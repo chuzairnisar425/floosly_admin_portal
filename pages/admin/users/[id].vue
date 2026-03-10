@@ -168,7 +168,7 @@ const userId = computed(() => parseInt(route.params.id))
 const loading = ref(true)
 const error = ref(null)
 
-// Fetch user data
+// central fetch logic (used both server/client and on navigation)
 const fetchUser = async () => {
   loading.value = true
   error.value = null
@@ -185,7 +185,25 @@ const fetchUser = async () => {
   }
 }
 
-onMounted(fetchUser)
+// fetch during SSR / initial load
+const { error: asyncError } = await useAsyncData(
+  `view-user-${userId.value}`,
+  fetchUser
+)
+
+if (asyncError.value) {
+  error.value = asyncError.value.message || 'Failed to load user details'
+}
+
+// refetch when route param changes
+watch(userId, () => {
+  fetchUser()
+})
+
+// clear current user when leaving page to avoid stale info
+onUnmounted(() => {
+  userStore.currentUser = null
+})
 
 const user = computed(() => userStore.currentUser)
 

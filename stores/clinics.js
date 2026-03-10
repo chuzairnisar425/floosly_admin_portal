@@ -69,9 +69,9 @@ export const useClinicStore = defineStore('clinics', {
 
   actions: {
     // Fetch all clinics
-    async fetchClinics() {
+    async fetchClinics(force = false) {
       // Don't refetch if we already have data (unless forced)
-      if (this.clinics.length > 0 && !this.loading) {
+      if (this.clinics.length > 0 && !this.loading && !force) {
         return this.clinics
       }
 
@@ -97,7 +97,10 @@ export const useClinicStore = defineStore('clinics', {
       }
     },
     
-    // Fetch single clinic
+    // Refresh clinics data (force fetch)
+    async refreshClinics() {
+      return this.fetchClinics(true)
+    },
     async fetchClinic(id) {
       this.loading = true
       this.error = null

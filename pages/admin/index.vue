@@ -193,8 +193,8 @@ const { toasts, removeToast, error: showError } = useToast()
 onMounted(async () => {
   try {
     await Promise.all([
-      clinicStore.fetchClinics(),
-      userStore.fetchUsers()
+      clinicStore.refreshClinics(),
+      userStore.refreshUsers()
     ])
   } catch (error) {
     console.error('Dashboard error:', error)

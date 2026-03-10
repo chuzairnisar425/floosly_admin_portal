@@ -221,6 +221,11 @@
             </div>
           </template>
         </DataTable>
+
+        <!-- show message when there are no users after filters -->
+        <div v-if="!userStore.loading && !filteredUsers.length" class="mt-6 text-center text-gray-500">
+          No users found.
+        </div>
       </div>
     </template>
 
@@ -300,6 +305,16 @@ definePageMeta({
   layout: 'admin'
 })
 
+// ensure filters start fresh when arriving (e.g. manual URL entry or back navigation)
+onBeforeMount(() => {
+  filters.value = {
+    search: '',
+    role: 'all',
+    status: 'all',
+    clinicId: 'all'
+  }
+})
+
 const userStore = useUserStore()
 const clinicStore = useClinicStore()
 const toast = useToast()
@@ -338,22 +353,22 @@ const confirmDialog = ref({
   action: null
 })
 
-// Load data on mount
-onMounted(async () => {
-  try {
-    await Promise.all([
-      userStore.fetchUsers(),
-      clinicStore.fetchClinics()
-    ])
-  } catch (error) {
-    toast.error('Failed to load data')
-  }
+// Load data with SSR support
+const { data: usersData, error: usersError, refresh: refreshUsers } = await useAsyncData('users', () => userStore.fetchUsers())
+const { data: clinicsData, error: clinicsError, refresh: refreshClinics } = await useAsyncData('clinics', () => clinicStore.fetchClinics())
 
-  // Check for search param in URL
-  if (route.query.search) {
-    filters.value.search = route.query.search
-  }
-})
+// Handle errors from async data
+if (usersError.value) {
+  console.error('Failed to load users:', usersError.value)
+}
+if (clinicsError.value) {
+  console.error('Failed to load clinics:', clinicsError.value)
+}
+
+// Check for search param in URL
+if (route.query.search) {
+  filters.value.search = route.query.search
+}
 
 // Keyboard shortcuts
 onMounted(() => {
@@ -532,11 +547,11 @@ const resetFilters = () => {
 const retryLoad = async () => {
   try {
     await Promise.all([
-      userStore.fetchUsers(),
-      clinicStore.fetchClinics()
+      refreshUsers(),
+      refreshClinics()
     ])
   } catch (error) {
-    // toast.error('Failed to reload data')
+    // Error handling is done by useAsyncData
   }
 }
 

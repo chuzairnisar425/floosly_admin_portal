@@ -89,7 +89,7 @@ const loading = ref(true)
 const submitting = ref(false)
 const error = ref(null)
 
-// Fetch data
+// centralised fetch logic - used by SSR and client
 const fetchData = async () => {
   loading.value = true
   error.value = null
@@ -106,7 +106,26 @@ const fetchData = async () => {
   }
 }
 
-onMounted(fetchData)
+// run on server & client when page first loads
+const { error: asyncError } = await useAsyncData(
+  `edit-user-${userId.value}`,
+  fetchData
+)
+
+if (asyncError.value) {
+  // propagate for UI
+  error.value = asyncError.value.message || 'Failed to load user details'
+}
+
+// also refresh if route param changes (client-side navigation)
+watch(userId, () => {
+  fetchData()
+})
+
+// clear current user when leaving page
+onUnmounted(() => {
+  userStore.currentUser = null
+})
 
 const user = computed(() => userStore.currentUser)
 

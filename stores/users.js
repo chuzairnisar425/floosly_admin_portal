@@ -91,15 +91,16 @@ export const useUserStore = defineStore('users', {
 
   actions: {
     // Fetch all users
-    async fetchUsers() {
+    async fetchUsers(force = false) {
       // Don't refetch if we already have data (unless forced)
-      if (this.users.length > 0 && !this.loading) {
+      if (this.users.length > 0 && !this.loading && !force) {
         return this.users
       }
 
       this.loading = true
       this.error = null
 
+      
       try {
         const { users } = useApi()
         const { data, error } = await users.getAll()
@@ -118,7 +119,10 @@ export const useUserStore = defineStore('users', {
       }
     },
     
-    // Fetch single user
+    // Refresh users data (force fetch)
+    async refreshUsers() {
+      return this.fetchUsers(true)
+    },
     async fetchUser(id) {
       this.loading = true
       this.error = null

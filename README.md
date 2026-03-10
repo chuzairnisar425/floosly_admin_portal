@@ -22,7 +22,7 @@ The Floosly Admin Portal is designed to streamline clinic and user management op
 
 ## Technologies
 
-- **Nuxt 3** - Vue 3 framework for building the application
+- **Nuxt 4** - Vue 3 framework for building the application
 - **TypeScript** - Type-safe development experience
 - **Tailwind CSS** - Utility-first CSS framework
 - **Pinia** - State management library
@@ -37,7 +37,7 @@ The Floosly Admin Portal is designed to streamline clinic and user management op
 
 1. **Clone the repository** (if applicable):
 ```bash
-git clone <repository-url>
+git clone https://github.com/chuzairnisar425/floosly_admin_portal.git
 cd floosly_admin_portal
 ```
 
